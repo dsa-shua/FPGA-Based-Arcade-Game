@@ -61,7 +61,7 @@ module coin_mid (
 
     logic IN_PLACE;
     always_comb begin
-        IN_PLACE = (sprite_y >= 640  && sprite_y < 720) ? 1: 0;          // set specific range on where it hits
+        IN_PLACE = (sprite_y >= 550  && sprite_y < 720) ? 1: 0;          // set specific range on where it hits
     end
     
     always@(posedge i_v_sync) begin
@@ -84,7 +84,7 @@ module coin_mid (
                 sprite_x <= 16'd680 - 16'd64;
             end
     
-            else if (sprite_y >= 600-50) begin
+            else if (sprite_y >= 500) begin
                 stretch <= 128;
                 stretch_factor <= 3;
                 sprite_x <= 16'd680 - 16'd100;

@@ -14,6 +14,7 @@ module sprite_compositor (
     input wire mv_left,
     input wire mv_right,
     input wire mv_jump,
+    input wire coin_hit,                        // make sprite yellow when coin hit
     input wire barrier_hit                      // make sprite red when barrier hit
     );
     
@@ -238,10 +239,10 @@ localparam [0:39][0:31][3:0] sprite_data1 = {/* verilator lint_off LITENDIAN */
     assign selected_palette = (CURRENT_JUMP_STATE == GROUND) ? (FEET_STATE ? sprite_data[sprite_render_y][sprite_render_x] : sprite_data1[sprite_render_y][sprite_render_x])
                                 :((CURRENT_JUMP_STATE == MID_UP || CURRENT_JUMP_STATE == MID_DOWN) ? sprite_data_jump0[sprite_render_y][sprite_render_x]
                                 : sprite_data_jump1[sprite_render_y][sprite_render_x]);
-                                                                         
-    assign o_red    = (sprite_hit_x && sprite_hit_y) ? (barrier_hit ? 8'hFF: palette_colors[selected_palette][2]): 8'hXX;
-    assign o_green  = (sprite_hit_x && sprite_hit_y) ? (barrier_hit ? 8'h00: palette_colors[selected_palette][1]) : 8'hXX;
-    assign o_blue   = (sprite_hit_x && sprite_hit_y) ? (barrier_hit ? 8'h00: palette_colors[selected_palette][0]) : 8'hXX;
+    
+    assign o_red    = (sprite_hit_x && sprite_hit_y) ? (barrier_hit ? 8'hFF : ((coin_hit) ? 8'hFF :  palette_colors[selected_palette][2])) : 8'hXX;                                                              
+    assign o_green  = (sprite_hit_x && sprite_hit_y) ? (barrier_hit ? 8'h00 : ((coin_hit) ? 8'hFF :  palette_colors[selected_palette][1])) : 8'hXX;
+    assign o_blue   = (sprite_hit_x && sprite_hit_y) ? (barrier_hit ? 8'h00 : ((coin_hit) ? 8'h00 :  palette_colors[selected_palette][0])) : 8'hXX;
     assign o_sprite_hit = (sprite_hit_y & sprite_hit_x) && (selected_palette != 2'd0);
     
 

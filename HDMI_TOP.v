@@ -13,16 +13,18 @@ module HDMI_TOP(
     output wire [2:0] hdmi_tx_n,    // Three HDMI channels differential negative
     output wire [2:0] hdmi_tx_p,     // Three HDMI channels differential positive
     output wire clk_lock,
-    output wire de,
-    output wire led,
+    output wire go_led,
+    output wire barrier_led,
    
+    output wire coin_led,
     output wire air_led,
     input wire btn1,                    // move penguin left
     input wire btn2,                    // jump penguin
     input wire btn3,                    // move pengiun right
     input wire [1:0] sw                 // only start game when HIGH sw[0] RIGHT
     );
-    
+    assign go_led = sw[0];
+    wire de;
     wire rst = RST_BTN;
     // Display Clocks
     wire pix_clk;                   // pixel clock
@@ -67,6 +69,7 @@ module HDMI_TOP(
         .V_POL(1)                   //       0        1        1         1
     )
     
+
     display_timings_inst (
         .i_pix_clk(pix_clk),
         .i_rst(rst),
@@ -126,7 +129,11 @@ module HDMI_TOP(
         .out_coin_hit           (COIN_HIT),
         .ZERO_LIVES             (ZERO_LIVES)                // send to FSM
         );
-
+    
+    assign coin_led = COIN_HIT;
+    assign barrier_led = PENGUIN_HIT;
+    
+    wire led;               // just dont connect :)
     wire tmds_ch0_serial, tmds_ch1_serial, tmds_ch2_serial, tmds_chc_serial;
     HDMI_generator HDMI_out (
         .i_pix_clk(pix_clk),

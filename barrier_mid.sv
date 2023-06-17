@@ -71,6 +71,7 @@ module barrier_mid (
             // adjust some streches
             if(sprite_y >= 360) begin
                 stretch_x = 64;
+                sprite_x = 16'd640 - 16'd32;
                 stretch_factor = 2;
             end
             if (sprite_y >= 440) begin

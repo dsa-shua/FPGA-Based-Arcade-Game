@@ -138,6 +138,7 @@ module gfx_inst(
          .ACTIVE_LANE       (PENGUIN_LANE),
          .AIRBORNE          (PENGUIN_ON_AIR),
          .SPRITE_STATE      (I_CURRENT_STATE),
+         .coin_hit          (COIN_HIT),
          .barrier_hit       (BARRIER_HIT)               // red sprite if barrier hit
      );
 

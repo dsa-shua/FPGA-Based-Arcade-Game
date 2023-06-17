@@ -10,7 +10,7 @@ module barrier_right (
     output wire in_position                     // barrier can now be hit
     );
 
-    reg [15:0] sprite_x     = 16'd640+16'd40; 
+    reg [15:0] sprite_x     = 16'd640; 
     reg [15:0] sprite_y     = 16'd360;          // somewhere at the bottom of the screen 
     wire sprite_hit_x, sprite_hit_y;
     wire [3:0] sprite_render_x;
@@ -65,7 +65,7 @@ module barrier_right (
     always@(posedge i_v_sync) begin
         if (active == 1) begin
             sprite_y = sprite_y + 10;
-            sprite_x = sprite_x + 10;
+            sprite_x = sprite_x + 8;
             if (sprite_y >= 16'd720) begin
                 sprite_y = 16'd720;
                 sprite_x = 16'd680;
@@ -79,10 +79,12 @@ module barrier_right (
             if (sprite_y >= 440) begin
                 stretch_x = 128;
                 stretch_factor = 3;
+//                sprite_x = 16'd680 - 64;
             end
             if (sprite_y >= 550) begin
                 stretch_x = 256;
                 stretch_factor = 4;
+//                sprite_x = 16'd680 - 128;
 //                IN_PLACE = (sprite_y == 600) ? 1 : 0;               // READY TO BE HIT
             end
         end

@@ -25,7 +25,7 @@ module coin_generator(
     logic[7:0] RIGHT_R, RIGHT_G, RIGHT_B;
     logic LEFT_S_HIT, MID_S_HIT, RIGHT_S_HIT;
     
-    reg[3:0] score = 4'b0000;
+    reg[4:0] score = 5'b00000;
     reg[7:0] PAINT_R, PAINT_G, PAINT_B;
     reg SPRITE_HIT;
     reg SPRITE_IN_POS;
@@ -112,27 +112,27 @@ module coin_generator(
         // check if we are hit
     always@(posedge i_v_sync) begin
         if(COIN_L_IN_POSITION && current_lane == 2'b01) begin // left
+            score <= score + 1'b1;
             temp_hit <= 1;
         end
         
         else if(COIN_M_IN_POSITION && current_lane == 2'b10) begin // mid
+                score <= score + 1'b1;
             temp_hit <= 1;
         end
         
         else if(COIN_R_IN_POSITION && current_lane == 2'b11) begin
+                score <= score + 1'b1;
             temp_hit <= 1;
         end 
         else if (active == 2'b00) begin // set to low only when no barrier is active
             temp_hit <= 0;
         end
     end
-    
-    always@(posedge temp_hit) begin
-        score <= score + 4'b0001;
-    end
+   
     
     assign penguin_hit = temp_hit;
-
+    assign score_value = score[4:1];
     assign o_red = PAINT_R;
     assign o_green = PAINT_G;
     assign o_blue = PAINT_B;
