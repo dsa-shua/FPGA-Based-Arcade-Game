@@ -76,7 +76,7 @@ module cloud2_compositor (
         // sprite_y <= sprite_y + (sprite_y_direction ? 1: -1);
 
                 
-        if(sprite_x == 1000) begin
+        if(sprite_x >= 1000) begin
             sprite_x_direction <= 0;
         end
         else if(sprite_x <= 300) begin

@@ -13,7 +13,8 @@ module sprite_compositor (
     input wire SPRITE_REFRESHER,                // used for blinking feet (?)
     input wire mv_left,
     input wire mv_right,
-    input wire mv_jump
+    input wire mv_jump,
+    input wire barrier_hit                      // make sprite red when barrier hit
     );
     
 //    enum logic [3:0] {START, COIN1, BARRIER1, COIN2, COIN3, BARRIER2, COIN4, BARRIER3, COIN5, BARRIER4, FINISH} STATE;
@@ -232,16 +233,15 @@ localparam [0:39][0:31][3:0] sprite_data1 = {/* verilator lint_off LITENDIAN */
     assign sprite_render_x = (i_x - sprite_x)>>3;
     assign sprite_render_y = (i_y - sprite_y)>>3;
     
-
     wire [3:0] selected_palette;
 
     assign selected_palette = (CURRENT_JUMP_STATE == GROUND) ? (FEET_STATE ? sprite_data[sprite_render_y][sprite_render_x] : sprite_data1[sprite_render_y][sprite_render_x])
                                 :((CURRENT_JUMP_STATE == MID_UP || CURRENT_JUMP_STATE == MID_DOWN) ? sprite_data_jump0[sprite_render_y][sprite_render_x]
                                 : sprite_data_jump1[sprite_render_y][sprite_render_x]);
                                                                          
-    assign o_red    = (sprite_hit_x && sprite_hit_y) ? palette_colors[selected_palette][2] : 8'hXX;
-    assign o_green  = (sprite_hit_x && sprite_hit_y) ? palette_colors[selected_palette][1] : 8'hXX;
-    assign o_blue   = (sprite_hit_x && sprite_hit_y) ? palette_colors[selected_palette][0] : 8'hXX;
+    assign o_red    = (sprite_hit_x && sprite_hit_y) ? (barrier_hit ? 8'hFF: palette_colors[selected_palette][2]): 8'hXX;
+    assign o_green  = (sprite_hit_x && sprite_hit_y) ? (barrier_hit ? 8'h00: palette_colors[selected_palette][1]) : 8'hXX;
+    assign o_blue   = (sprite_hit_x && sprite_hit_y) ? (barrier_hit ? 8'h00: palette_colors[selected_palette][0]) : 8'hXX;
     assign o_sprite_hit = (sprite_hit_y & sprite_hit_x) && (selected_palette != 2'd0);
     
 
@@ -258,7 +258,7 @@ localparam [0:39][0:31][3:0] sprite_data1 = {/* verilator lint_off LITENDIAN */
         
         // adjust x-coords only when not in air, cannot jump while moving left or right
         if(CURRENT_JUMP_STATE == GROUND && mv_jump == 0) begin
-            JUMP_TIMER <= 3'b000;                    // Always reset jump timer at ground
+            JUMP_TIMER <= 4'b0000;                    // Always reset jump timer at ground
 //            JUMP_REQUEST <= 0;                       // ALWAYS reset jump request
             if(CURRENT_LANE == LEFT) begin
                 if (sprite_x != BASE_LEFT) begin

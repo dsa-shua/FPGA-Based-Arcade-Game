@@ -15,7 +15,7 @@ module coin_right (
     wire sprite_hit_x, sprite_hit_y;
     wire [3:0] sprite_render_x;
     wire [4:0] sprite_render_y;
-    reg IN_PLACE = 0;               // 0 if coin is still travelling. 1 if coin is now ready to be hit
+//    reg IN_PLACE = 0;               // 0 if coin is still travelling. 1 if coin is now ready to be hit
 
 
 // transparent, yellow, orange, dark orange
@@ -62,6 +62,10 @@ module coin_right (
     
     assign o_sprite_hit = active ? (sprite_hit_y & sprite_hit_x) && (selected_palette != 2'd0): 1'b0;
 
+    logic IN_PLACE;
+    always_comb begin
+        IN_PLACE = (sprite_y >= 640  && sprite_y < 720) ? 1: 0;          // set specific range on where it hits
+    end    
     
     always@(posedge i_v_sync) begin
         if (active == 1) begin
@@ -70,7 +74,7 @@ module coin_right (
             if(sprite_y > 720) begin
                 sprite_y <= 720;
                 sprite_x <= 16'd640;
-                IN_PLACE <= 0;
+//                IN_PLACE <= 0;
                 stretch_factor <= 1;
                 stretch <= 32;
             end
@@ -87,7 +91,7 @@ module coin_right (
             else if (sprite_y >= 600-50) begin
                 stretch <= 128;
                 stretch_factor <= 3;
-                IN_PLACE <= 1;   // this coin is now ready to be hit
+//                IN_PLACE <= 1;   // this coin is now ready to be hit
             end
         end
         else if (active == 0) begin
@@ -95,7 +99,7 @@ module coin_right (
             sprite_x <= 16'd640;
 //            stretch_factor <= 1;
 //            stretch <= 32;
-            IN_PLACE <= 0;
+//            IN_PLACE <= 0;
         end 
     end
 

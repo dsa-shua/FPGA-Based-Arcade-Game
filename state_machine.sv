@@ -5,6 +5,8 @@ module state_machine(
 //    input wire MV_RIGHT,
 //    input wire MV_JUMP,
     
+    input wire          PENGUIN_HIT,
+    input wire          COIN_HIT,
     output wire [11:0]  DISTANCE_TO_GO,
     output wire [7:0]   O_CURRENT_STATE,
     output wire [1:0]   RELEASE_COIN,
@@ -138,12 +140,22 @@ module state_machine(
             active_barrier = RELEASE_NULL;
             active_coin = RELEASE_NULL;
         end
+        
+        
+        // deactivate barrier or coin if hit
+        if(PENGUIN_HIT) begin
+            active_barrier = RELEASE_NULL;
+        end
+        
+        if(COIN_HIT) begin
+            active_coin = RELEASE_NULL;
+        end
     end
     
     assign DISTANCE_TO_GO = remaining_distance;
     assign O_CURRENT_STATE = current_state;
     assign RELEASE_COIN = active_coin;
-    assign RELEASE_BARRIER  = active_barrier;
+    assign RELEASE_BARRIER  = (PENGUIN_HIT) ? RELEASE_NULL : active_barrier;
     assign SPRITE_REFRESHER = REFRESHER;
 
 endmodule

@@ -15,7 +15,7 @@ module barrier_left (
     wire sprite_hit_x, sprite_hit_y;
     wire [3:0] sprite_render_x;
     wire [3:0] sprite_render_y;
-    reg IN_PLACE = 0;                           // barrier in place
+//    reg IN_PLACE = 0;                           // barrier in place
 
     localparam /* verilator lint_off LITENDIAN */[0:3][2:0][7:0] palette_colors =  { /* verilator lint_off LITENDIAN */
         8'h00, 8'h00, 8'h00,
@@ -54,7 +54,11 @@ module barrier_left (
     assign o_green  = (sprite_hit_x && sprite_hit_y) ? palette_colors[selected_palette][1] : 8'hXX;
     assign o_blue   = (sprite_hit_x && sprite_hit_y) ? palette_colors[selected_palette][0] : 8'hXX;
     assign o_sprite_hit = active ? (sprite_hit_y & sprite_hit_x) && (selected_palette != 2'd0): 1'b0;
-
+    
+    logic IN_PLACE;
+    always_comb begin
+        IN_PLACE = (sprite_y == 640) ? 1: 0;          // set specific range on where it hits
+    end
 
 
     always@(posedge i_v_sync) begin
@@ -64,7 +68,7 @@ module barrier_left (
             if (sprite_y >= 16'd720) begin
                 sprite_y = 16'd720; // hide 
                 sprite_x = 16'd490-16'd32;
-                IN_PLACE = 0;
+//                IN_PLACE = 0;
             end
             
             if(sprite_y >= 360) begin
@@ -78,13 +82,13 @@ module barrier_left (
             if (sprite_y >= 550) begin
                 stretch_x = 256;
                 stretch_factor = 4;
-                IN_PLACE = 1;               // READY TO BE HIT
+//                IN_PLACE = (sprite_y == 600) ? 1 : 0;               // READY TO BE HIT
             end
         end
         else if (active == 0) begin
                 sprite_y = 16'd360;
                 sprite_x = 16'd490-16'd32;
-                IN_PLACE = 0;
+//                IN_PLACE = 0;
         end
     end 
     assign in_position = IN_PLACE;

@@ -9,7 +9,10 @@ module gfx_inst(
     output reg [7:0] o_red,
     output reg [7:0] o_green,
     output reg [7:0] o_blue,
-
+    
+    output wire out_coin_hit,                       // tell FSM to deactivate coin
+    output wire out_barrier_hit,                    // tell FSM to deactivate barrier
+    output wire OUT_AIRBORNE,                       // check if airborne
     input wire [11:0]   REMAINING_DISTANCE,         // distance value received from FSM
     input wire [7:0]    I_CURRENT_STATE,            // current state received from FSM
     input wire [1:0]    I_ACTIVE_COIN,              // received from FSM
@@ -27,6 +30,7 @@ module gfx_inst(
     wire BARRIER_IN_POSITION;           // barrier on mid ready
     wire BARRIER_L_IN_POSITION;         // barrier on left ready
     wire BARRIER_R_IN_POSITION;         // barrier on right ready
+    wire AIRBORNE;
     
     // wire REMAINING_DISTANCE;            // remaining distance, sent by state machine
     wire CURRENT_POINTS;                // # of coins collected, sent by penguin
@@ -106,7 +110,8 @@ module gfx_inst(
     
     wire PENGUIN_ON_AIR;                    // penguin airborne ? 1 : 0
     wire [1:0] PENGUIN_LANE;                // penguin active lane || 00: Left, 10 mid, 11, right
-   
+    wire [3:0] score_value;                 // sent by coin generator to score_counter module
+   assign OUT_AIRBORNE = PENGUIN_ON_AIR;
    // background
    test_card_simple test_card_simple_1(
             .i_x (i_x),
@@ -132,7 +137,8 @@ module gfx_inst(
          .SPRITE_REFRESHER  (SPRITE_REFRESHER),
          .ACTIVE_LANE       (PENGUIN_LANE),
          .AIRBORNE          (PENGUIN_ON_AIR),
-         .SPRITE_STATE      (I_CURRENT_STATE)
+         .SPRITE_STATE      (I_CURRENT_STATE),
+         .barrier_hit       (BARRIER_HIT)               // red sprite if barrier hit
      );
 
     // id compositor
@@ -180,7 +186,7 @@ module gfx_inst(
         .o_sprite_hit   (cloud2_hit)
     );
 
-
+    
     coin_generator coin_generator_module(
         .i_x                (i_x),
         .i_y                (i_y),
@@ -190,7 +196,10 @@ module gfx_inst(
         .o_green            (coin_green),
         .o_blue             (coin_blue),
         .o_sprite_hit       (coin_hit),
-        .in_position        (COIN_IN_POSITION)
+        .in_position        (COIN_IN_POSITION),
+        .penguin_hit        (COIN_HIT),
+        .current_lane       (PENGUIN_LANE),             // sent from sprite compositor
+        .score_value        (score_value)               // send to score_counter
     );
 
     score_header_compositor score_header(
@@ -256,7 +265,7 @@ module gfx_inst(
         .i_v_sync       (i_v_sync),
         .sprite_x       (16'd750),              // const
         .sprite_y       (16'd64),               // const
-        .value          (I_CURRENT_STATE),                    // receive score from penguin
+        .value          (score_value),          // receive score from coin generator
         .o_red          (point_red),
         .o_green        (point_green),
         .o_blue         (point_blue),
@@ -355,4 +364,6 @@ module gfx_inst(
     end
     
     assign ZERO_LIVES = OUT_OF_LIVES;
+    assign out_barrier_hit = BARRIER_HIT;
+    assign out_coin_hit = COIN_HIT;
 endmodule

@@ -75,8 +75,8 @@ module test_card_simple #(H_RES=1280, V_RES=720) (
     end
 
     // assign to output
-    assign o_red = on_road_edge ? 8'h00 : paint_r;
-    assign o_green = on_road_edge ? 8'h00 : paint_g;
-    assign o_blue = on_road_edge ? 8'h00 : paint_b;
+    assign o_red = paint_r;
+    assign o_green = paint_g;
+    assign o_blue = paint_b;
 
 endmodule

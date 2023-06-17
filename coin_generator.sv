@@ -2,6 +2,10 @@ module coin_generator(
     input wire [15:0] i_x,
     input wire [15:0] i_y,
     input wire i_v_sync,
+    
+    output wire [11:0] score_value,
+    input wire[1:0] current_lane,   // from FSM, check current penguin lane
+    output wire penguin_hit,        // tell score to add 1
     input wire[2:0] active,         // 00: no coin, 01: left, 10: mid: 11: right       
     output wire [7:0] o_red,
     output wire [7:0] o_green,
@@ -20,7 +24,8 @@ module coin_generator(
     logic[7:0] MID_R, MID_G, MID_B;
     logic[7:0] RIGHT_R, RIGHT_G, RIGHT_B;
     logic LEFT_S_HIT, MID_S_HIT, RIGHT_S_HIT;
-
+    
+    reg[3:0] score = 4'b0000;
     reg[7:0] PAINT_R, PAINT_G, PAINT_B;
     reg SPRITE_HIT;
     reg SPRITE_IN_POS;
@@ -62,6 +67,7 @@ module coin_generator(
         .in_position    (COIN_R_IN_POSITION)
     );
 
+    reg temp_hit = 0;
     always_latch begin 
         if(active == 2'b00) begin
             MID_COIN_ACTIVATE = 1'b0;
@@ -70,7 +76,7 @@ module coin_generator(
             SPRITE_HIT = 1'b0;
             SPRITE_IN_POS = 1'b0;
         end
-        else if (active == 2'b01) begin
+        else if (active == 2'b01 && temp_hit == 0) begin
             MID_COIN_ACTIVATE = 1'b0;
             LEFT_COIN_ACTIVATE =1'b1;
             RIGHT_COIN_ACTIVATE = 1'b0;
@@ -80,7 +86,7 @@ module coin_generator(
             PAINT_G = LEFT_G;
             PAINT_B = LEFT_B;
         end
-        else if (active == 2'b10) begin
+        else if (active == 2'b10 && temp_hit == 0) begin
             MID_COIN_ACTIVATE = 1'b1;
             LEFT_COIN_ACTIVATE =1'b0;
             RIGHT_COIN_ACTIVATE = 1'b0;
@@ -90,7 +96,7 @@ module coin_generator(
             PAINT_G = MID_G;
             PAINT_B = MID_B;
         end
-        else if (active == 2'b11) begin
+        else if (active == 2'b11 && temp_hit == 0) begin
             MID_COIN_ACTIVATE = 1'b0;
             LEFT_COIN_ACTIVATE =1'b0;
             RIGHT_COIN_ACTIVATE = 1'b1;
@@ -101,6 +107,31 @@ module coin_generator(
             PAINT_B = RIGHT_B;
         end
     end
+    
+
+        // check if we are hit
+    always@(posedge i_v_sync) begin
+        if(COIN_L_IN_POSITION && current_lane == 2'b01) begin // left
+            temp_hit <= 1;
+        end
+        
+        else if(COIN_M_IN_POSITION && current_lane == 2'b10) begin // mid
+            temp_hit <= 1;
+        end
+        
+        else if(COIN_R_IN_POSITION && current_lane == 2'b11) begin
+            temp_hit <= 1;
+        end 
+        else if (active == 2'b00) begin // set to low only when no barrier is active
+            temp_hit <= 0;
+        end
+    end
+    
+    always@(posedge temp_hit) begin
+        score <= score + 4'b0001;
+    end
+    
+    assign penguin_hit = temp_hit;
 
     assign o_red = PAINT_R;
     assign o_green = PAINT_G;

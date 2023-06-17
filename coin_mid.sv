@@ -15,7 +15,7 @@ module coin_mid (
     wire sprite_hit_x, sprite_hit_y;
     wire [3:0] sprite_render_x;
     wire [4:0] sprite_render_y;           
-    reg IN_PLACE = 0;               // 0 if coin is still travelling. 1 if coin is now ready to be hit
+//    reg IN_PLACE = 0;               // 0 if coin is still travelling. 1 if coin is now ready to be hit
 
 // transparent, yellow, orange, dark orange
     localparam /* verilator lint_off LITENDIAN */[0:3][2:0][7:0] palette_colors =  { /* verilator lint_off LITENDIAN */
@@ -47,10 +47,6 @@ module coin_mid (
     logic[15:0] stretch;
     logic [3:0] stretch_factor;
 
-    always_latch begin
-
-    end
-
     assign sprite_hit_x = (i_x >= sprite_x) && (i_x < sprite_x + stretch);
     assign sprite_hit_y = (i_y >= sprite_y) && (i_y < sprite_y + stretch);
     assign sprite_render_x = (i_x - sprite_x)>>stretch_factor;
@@ -63,13 +59,17 @@ module coin_mid (
     assign o_blue   = (sprite_hit_x && sprite_hit_y) ? palette_colors[selected_palette][0] : 8'hXX;
     assign o_sprite_hit = active ? (sprite_hit_y & sprite_hit_x) && (selected_palette != 2'd0): 1'b0;
 
+    logic IN_PLACE;
+    always_comb begin
+        IN_PLACE = (sprite_y >= 640  && sprite_y < 720) ? 1: 0;          // set specific range on where it hits
+    end
     
     always@(posedge i_v_sync) begin
         if (active == 1) begin
             sprite_y <= sprite_y + 10;
             if(sprite_y > 720) begin
                 sprite_y <= 720;    // when over the screen, stay hidden
-                IN_PLACE <= 0;
+//                IN_PLACE <= 0;
             end
 
             if(sprite_y >= 360-50 && sprite_y < 440-50) begin
@@ -88,12 +88,12 @@ module coin_mid (
                 stretch <= 128;
                 stretch_factor <= 3;
                 sprite_x <= 16'd680 - 16'd100;
-                IN_PLACE <= 1;   // this coin is now ready to be hit
+//                IN_PLACE <= 1;   // this coin is now ready to be hit
             end           
         end
         else if (active == 0) begin
             sprite_y <= 360-50;
-            IN_PLACE <= 0;
+//            IN_PLACE <= 0;
         end
     end
     assign in_position = IN_PLACE;

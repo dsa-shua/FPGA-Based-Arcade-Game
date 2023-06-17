@@ -113,12 +113,9 @@ module barrier_generator(
     assign o_blue = PAINT_B;
     assign o_sprite_hit = SPRITE_HIT;
     
-    always@(*) begin
-        sprite_current_lane = current_lane;             // save to register
-    end
     
     // check if we are hit
-    always_comb begin
+    always@(posedge i_v_sync) begin
         if(BARRIER_L_IN_POSITION && current_lane == 2'b01) begin // left
             temp_hit <= 1;
         end

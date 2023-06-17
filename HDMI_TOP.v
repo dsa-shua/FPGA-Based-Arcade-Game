@@ -16,6 +16,7 @@ module HDMI_TOP(
     output wire de,
     output wire led,
    
+    output wire air_led,
     input wire btn1,                    // move penguin left
     input wire btn2,                    // jump penguin
     input wire btn3,                    // move pengiun right
@@ -88,6 +89,8 @@ module HDMI_TOP(
     wire[1:0]   FSM_BARRIER;
     wire        REFRESHER;
     wire        ZERO_LIVES;     // sent from life compositor, set game to finish
+    wire        PENGUIN_HIT;
+    wire        COIN_HIT;
    
    state_machine FSM(
         .GAME_SWITCH            (sw[0]),
@@ -97,6 +100,8 @@ module HDMI_TOP(
         .RELEASE_COIN           (FSM_COIN),
         .RELEASE_BARRIER        (FSM_BARRIER),
         .SPRITE_REFRESHER       (REFRESHER),
+        .PENGUIN_HIT            (PENGUIN_HIT),
+        .COIN_HIT               (COIN_HIT),
         .ZERO_LIVES             (ZERO_LIVES)            // receive from GFX
    );
    
@@ -108,6 +113,7 @@ module HDMI_TOP(
         .o_red(red),
         .o_green(green),
         .o_blue(blue),
+        .out_barrier_hit        (PENGUIN_HIT),
         .REMAINING_DISTANCE     (REMAINING_DISTANCE),
         .I_CURRENT_STATE        (FSM_CURRENT_STATE),
         .I_ACTIVE_COIN          (FSM_COIN),
@@ -116,6 +122,8 @@ module HDMI_TOP(
         .MV_LEFT                (btn3),
         .MV_RIGHT               (btn1),
         .MV_JUMP                (btn2),
+        .OUT_AIRBORNE           (air_led),
+        .out_coin_hit           (COIN_HIT),
         .ZERO_LIVES             (ZERO_LIVES)                // send to FSM
         );
 
