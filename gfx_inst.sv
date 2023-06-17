@@ -177,15 +177,15 @@ module gfx_inst(
         .o_sprite_hit   (cloud1_hit)
     );
     
-    cloud2_compositor cloud2 (
-        .i_x            (i_x),
-        .i_y            (i_y),
-        .i_v_sync       (i_v_sync),
-        .o_red          (cloud2_red),
-        .o_green        (cloud2_green),
-        .o_blue         (cloud2_blue),
-        .o_sprite_hit   (cloud2_hit)
-    );
+//    cloud2_compositor cloud2 (
+//        .i_x            (i_x),
+//        .i_y            (i_y),
+//        .i_v_sync       (i_v_sync),
+//        .o_red          (cloud2_red),
+//        .o_green        (cloud2_green),
+//        .o_blue         (cloud2_blue),
+//        .o_sprite_hit   (cloud2_hit)
+//    );
 
     
     coin_generator coin_generator_module(
