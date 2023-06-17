@@ -40,7 +40,7 @@ module barrier_generator(
         end
         
         // activation only if sprite is not yet hit
-        else if (active == 2'b01) begin
+        else if (active == 2'b01 && temp_hit == 0) begin
             MID_BARRIER_ACTIVATE = 1'b0;
             LEFT_BARRIER_ACTIVATE =1'b1;
             RIGHT_BARRIER_ACTIVATE = 1'b0;
@@ -50,7 +50,7 @@ module barrier_generator(
             PAINT_G = LEFT_G;
             PAINT_B = LEFT_B;
         end
-        else if (active == 2'b10) begin
+        else if (active == 2'b10 && temp_hit == 0) begin
             MID_BARRIER_ACTIVATE = 1'b1;
             LEFT_BARRIER_ACTIVATE =1'b0;
             RIGHT_BARRIER_ACTIVATE = 1'b0;
@@ -60,7 +60,7 @@ module barrier_generator(
             PAINT_G = MID_G;
             PAINT_B = MID_B;
         end
-        else if (active == 2'b11) begin
+        else if (active == 2'b11 && temp_hit == 0) begin
             MID_BARRIER_ACTIVATE = 1'b0;
             LEFT_BARRIER_ACTIVATE =1'b0;
             RIGHT_BARRIER_ACTIVATE = 1'b1;
@@ -113,22 +113,24 @@ module barrier_generator(
     assign o_blue = PAINT_B;
     assign o_sprite_hit = SPRITE_HIT;
     
+    always@(*) begin
+        sprite_current_lane = current_lane;             // save to register
+    end
     
     // check if we are hit
-    always@(posedge i_v_sync) begin
-        sprite_current_lane = current_lane;             // save to register
-        if(sprite_current_lane == 2'b00 && BARRIER_L_IN_POSITION) begin // left
+    always_comb begin
+        if(BARRIER_L_IN_POSITION && current_lane == 2'b01) begin // left
             temp_hit <= 1;
         end
         
-        else if(sprite_current_lane == 2'b10 && BARRIER_M_IN_POSITION) begin // mid
+        else if(BARRIER_M_IN_POSITION && current_lane == 2'b10) begin // mid
             temp_hit <= 1;
         end
         
-        else if(sprite_current_lane == 2'b11 && BARRIER_R_IN_POSITION) begin
+        else if(BARRIER_R_IN_POSITION && current_lane == 2'b11) begin
             temp_hit <= 1;
         end 
-        else if (active == 0) begin // set to low only when no barrier is active
+        else if (active == 2'b00) begin // set to low only when no barrier is active
             temp_hit <= 0;
         end
     end

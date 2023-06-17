@@ -131,6 +131,7 @@ module life_compositor (
         end
         else if (lives == 2'b00) begin
             selected_palette = sprite_data0[sprite_render_y][sprite_render_x];
+//            ZERO_LIVES = 1; // pls end the game
         end
     end
                                                                              

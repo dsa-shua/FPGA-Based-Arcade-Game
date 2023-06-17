@@ -47,6 +47,12 @@ module state_machine(
     end
 
     always@(negedge i_v_sync) begin
+        if (ZERO_LIVES == 1) begin
+            current_state = FINISH;
+            active_barrier = RELEASE_NULL;
+            active_coin = RELEASE_NULL;
+        end
+    
         // Progression
         if(current_state == START && ZERO_LIVES == 0) begin                                        // 0
             if (remaining_distance == 12'd180) begin
@@ -131,12 +137,6 @@ module state_machine(
         else if (current_state == FINISH) begin                                 // 10
             active_barrier = RELEASE_NULL;
             active_coin = RELEASE_NULL;
-        end
-        
-        else if (ZERO_LIVES == 1) begin
-            active_barrier = RELEASE_NULL;
-            active_coin = RELEASE_NULL;
-            current_state = FINISH;
         end
     end
     

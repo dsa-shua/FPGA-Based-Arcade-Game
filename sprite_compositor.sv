@@ -15,7 +15,10 @@ module sprite_compositor (
     input wire mv_jump
     );
     
-    enum logic [1:0] {LEFT, MID, RIGHT} LANE;
+//    enum logic [1:0] {LEFT, MID, RIGHT} LANE;
+    localparam[1:0] LEFT = 2'b01;
+    localparam[1:0] MID = 2'b10;
+    localparam[1:0] RIGHT = 2'b11;
     localparam[15:0] BASE_LEFT = 16'd262;        // if sprite not in here, gradually move
     localparam[15:0] BASE_MID = 16'd512;         // if sprite not in here, gradually move
     localparam[15:0] BASE_RIGHT = 16'd762;       // if sprite not in here, gradually move
@@ -239,8 +242,7 @@ localparam [0:39][0:31][3:0] sprite_data1 = {/* verilator lint_off LITENDIAN */
     assign o_blue   = (sprite_hit_x && sprite_hit_y) ? palette_colors[selected_palette][0] : 8'hXX;
     assign o_sprite_hit = (sprite_hit_y & sprite_hit_x) && (selected_palette != 2'd0);
     
-    assign ACTIVE_LANE = CURRENT_LANE;                              // tell coin and barrier where penguin is
-    assign AIRBORNE = (CURRENT_JUMP_STATE == GROUND) ? 0 : 1;       // tell barrier we high
+
 
     reg CONTROL = 0;
 //    reg JUMP_REQUEST = 0;
@@ -327,7 +329,9 @@ localparam [0:39][0:31][3:0] sprite_data1 = {/* verilator lint_off LITENDIAN */
             end
         end
     end 
-
+    
+    assign ACTIVE_LANE = CURRENT_LANE;                              // tell coin and barrier where penguin is
+    assign AIRBORNE = (CURRENT_JUMP_STATE == GROUND) ? 0 : 1;       // tell barrier we high
     // walking animation 
     always@(posedge SPRITE_REFRESHER) begin
         FEET_STATE = ~FEET_STATE;
