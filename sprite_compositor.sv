@@ -7,6 +7,7 @@ module sprite_compositor (
     output wire [7:0] o_blue,
     output wire o_sprite_hit,
     
+    input wire[7:0] SPRITE_STATE,
     output wire AIRBORNE,                       // checked by barrier
     output wire [1:0]   ACTIVE_LANE,            // checked by coin and barrier for collision
     input wire SPRITE_REFRESHER,                // used for blinking feet (?)
@@ -15,6 +16,7 @@ module sprite_compositor (
     input wire mv_jump
     );
     
+//    enum logic [3:0] {START, COIN1, BARRIER1, COIN2, COIN3, BARRIER2, COIN4, BARRIER3, COIN5, BARRIER4, FINISH} STATE;
 //    enum logic [1:0] {LEFT, MID, RIGHT} LANE;
     localparam[1:0] LEFT = 2'b01;
     localparam[1:0] MID = 2'b10;
@@ -280,12 +282,12 @@ localparam [0:39][0:31][3:0] sprite_data1 = {/* verilator lint_off LITENDIAN */
         end
         
         // only when in ground, start jump 
-        else if (mv_jump == 1 && CURRENT_JUMP_STATE == GROUND) begin
+        else if (mv_jump == 1 && CURRENT_JUMP_STATE == GROUND && SPRITE_STATE != 4'ha) begin
             CURRENT_JUMP_STATE <= MID_UP;
         end
         
         // Only executes if in air
-        else if (CURRENT_JUMP_STATE != GROUND) begin
+        else if (CURRENT_JUMP_STATE != GROUND && SPRITE_STATE != 4'ha) begin
             JUMP_TIMER <= JUMP_TIMER + 1; // slowly count to 1111
             if(JUMP_TIMER == 4'b1111) begin
                     if (CURRENT_JUMP_STATE == MID_UP) begin
@@ -304,34 +306,37 @@ localparam [0:39][0:31][3:0] sprite_data1 = {/* verilator lint_off LITENDIAN */
 
     always@(posedge CONTROL) begin
         // accept horizontal movement only when at ground
-        if(CURRENT_JUMP_STATE == GROUND) begin   
-            if(mv_left == 1) begin
-                if(CURRENT_LANE == LEFT) begin
+        if (SPRITE_STATE != 4'ha) begin
+            if(CURRENT_JUMP_STATE == GROUND) begin   
+                if(mv_left == 1) begin
+                    if(CURRENT_LANE == LEFT) begin
+                    end
+                    else if(CURRENT_LANE == MID) begin
+                        CURRENT_LANE <= LEFT;             
+                    end
+                    else if(CURRENT_LANE == RIGHT) begin
+                        CURRENT_LANE <= MID;
+                    end
                 end
-                else if(CURRENT_LANE == MID) begin
-                    CURRENT_LANE <= LEFT;             
-                end
-                else if(CURRENT_LANE == RIGHT) begin
-                    CURRENT_LANE <= MID;
-                end
-            end
-            
-            if(mv_right == 1) begin
-                if (CURRENT_LANE == LEFT) begin
-                    CURRENT_LANE <= MID;
-                end
-                else if (CURRENT_LANE == MID) begin
-                    CURRENT_LANE <= RIGHT;
-                end
-                else if (CURRENT_LANE == RIGHT) begin
                 
+                if(mv_right == 1) begin
+                    if (CURRENT_LANE == LEFT) begin
+                        CURRENT_LANE <= MID;
+                    end
+                    else if (CURRENT_LANE == MID) begin
+                        CURRENT_LANE <= RIGHT;
+                    end
+                    else if (CURRENT_LANE == RIGHT) begin
+                    
+                    end
                 end
             end
         end
     end 
     
-    assign ACTIVE_LANE = CURRENT_LANE;                              // tell coin and barrier where penguin is
-    assign AIRBORNE = (CURRENT_JUMP_STATE == GROUND) ? 0 : 1;       // tell barrier we high
+    logic isAIRBORNE = (CURRENT_JUMP_STATE == GROUND) ? 0 : 1; 
+    assign ACTIVE_LANE = isAIRBORNE ? 2'b00 : CURRENT_LANE;         // tell coin and barrier where penguin is
+    assign AIRBORNE = isAIRBORNE;                                   // tell barrier we high
     // walking animation 
     always@(posedge SPRITE_REFRESHER) begin
         FEET_STATE = ~FEET_STATE;

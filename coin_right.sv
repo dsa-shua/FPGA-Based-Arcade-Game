@@ -71,6 +71,8 @@ module coin_right (
                 sprite_y <= 720;
                 sprite_x <= 16'd640;
                 IN_PLACE <= 0;
+                stretch_factor <= 1;
+                stretch <= 32;
             end
             
             if(sprite_y >= 360-50 && sprite_y < 440-50) begin
@@ -91,6 +93,8 @@ module coin_right (
         else if (active == 0) begin
             sprite_y <= 360-50;
             sprite_x <= 16'd640;
+//            stretch_factor <= 1;
+//            stretch <= 32;
             IN_PLACE <= 0;
         end 
     end

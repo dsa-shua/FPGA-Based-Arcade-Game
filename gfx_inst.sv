@@ -131,7 +131,8 @@ module gfx_inst(
          .mv_jump           (MV_JUMP),
          .SPRITE_REFRESHER  (SPRITE_REFRESHER),
          .ACTIVE_LANE       (PENGUIN_LANE),
-         .AIRBORNE          (PENGUIN_ON_AIR)
+         .AIRBORNE          (PENGUIN_ON_AIR),
+         .SPRITE_STATE      (I_CURRENT_STATE)
      );
 
     // id compositor

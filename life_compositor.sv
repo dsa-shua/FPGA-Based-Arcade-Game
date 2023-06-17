@@ -21,8 +21,8 @@ module life_compositor (
 
     // reduce lives if we hit barrier
     always@(posedge barrier_hit) begin
-        lives <= lives - 1'b1;
-        if(lives == 2'b00) begin
+        lives <= lives - 2'b01;
+        if(lives == 2'b01) begin
             ZERO_LIVES <= 1; // signal that the game is now over..
         end
     end

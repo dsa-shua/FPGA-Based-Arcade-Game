@@ -75,7 +75,7 @@ module barrier_mid (
                 sprite_x = 16'd640 - 16'd64;
                 stretch_factor = 3;
             end
-            if (sprite_y >= 550) begin
+            if (sprite_y >= 650) begin
                 stretch_x = 256;
                 sprite_x = 16'd640 -16'd128;
                 stretch_factor = 4;
