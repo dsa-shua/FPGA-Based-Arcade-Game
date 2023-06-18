@@ -19,7 +19,12 @@ module gfx_inst(
     input wire [1:0]    I_ACTIVE_BARRIER,           // received from FSM
     output wire         ZERO_LIVES                  // send to FSM to set game to FINISH
     );
-
+    
+    logic ACTIVATE_FINAL;
+    always_comb begin
+        ACTIVATE_FINAL = (I_CURRENT_STATE == 4'd10) ? 1 : 0;
+    end
+    
     wire ACTIVATE_COIN_LEFT;            // show coin on left
     wire ACTIVATE_COIN_MID;             // show coin on mid
     wire ACTIVATE_COIN_RIGHT;           // show coin on right
@@ -108,6 +113,11 @@ module gfx_inst(
     wire[7:0] point_blue;
     wire point_hit;
     
+    wire[7:0]   final_red;
+    wire[7:0]   final_green;
+    wire[7:0]   final_blue;
+    wire final_hit;
+    
     wire PENGUIN_ON_AIR;                    // penguin airborne ? 1 : 0
     wire [1:0] PENGUIN_LANE;                // penguin active lane || 00: Left, 10 mid, 11, right
     wire [3:0] score_value;                 // sent by coin generator to score_counter module
@@ -167,26 +177,37 @@ module gfx_inst(
     );
 
      //cloud1 compositor
-    cloud1_compositor cloud1 (
-        .i_x            (i_x),
-        .i_y            (i_y),
-        .i_v_sync       (i_v_sync),
-        .o_red          (cloud1_red),
-        .o_green        (cloud1_green),
-        .o_blue         (cloud1_blue),
-        .o_sprite_hit   (cloud1_hit)
-    );
-    
-//    cloud2_compositor cloud2 (
+//    cloud1_compositor cloud1 (
 //        .i_x            (i_x),
 //        .i_y            (i_y),
 //        .i_v_sync       (i_v_sync),
-//        .o_red          (cloud2_red),
-//        .o_green        (cloud2_green),
-//        .o_blue         (cloud2_blue),
-//        .o_sprite_hit   (cloud2_hit)
+//        .o_red          (cloud1_red),
+//        .o_green        (cloud1_green),
+//        .o_blue         (cloud1_blue),
+//        .o_sprite_hit   (cloud1_hit)
 //    );
-
+    
+    cloud2_compositor cloud2 (
+        .i_x            (i_x),
+        .i_y            (i_y),
+        .i_v_sync       (i_v_sync),
+        .o_red          (cloud2_red),
+        .o_green        (cloud2_green),
+        .o_blue         (cloud2_blue),
+        .o_sprite_hit   (cloud2_hit)
+    );
+    
+    final_score final_score_module(
+        .i_x                (i_x),
+        .i_y                (i_y),
+        .i_v_sync           (i_v_sync),
+        .o_red              (final_red),
+        .o_green            (final_green),
+        .o_blue             (final_blue),
+        .o_sprite_hit       (final_hit),
+        .IS_END             (ACTIVATE_FINAL),       // receive from FSM
+        .score_value        (score_value)           // receive from coin compositor                     
+    );
     
     coin_generator coin_generator_module(
         .i_x                (i_x),
@@ -273,19 +294,22 @@ module gfx_inst(
         .o_sprite_hit   (point_hit)
     );
 
-    always@(*) begin        
-        if (sprite_hit == 1) begin
-            o_red=sprite_red;
-            o_green=sprite_green;
-            o_blue=sprite_blue;
+    always@(*) begin     
+
+        
+        if(final_hit) begin
+            o_red = final_red;
+            o_green = final_green;
+            o_blue = final_blue;
         end
-        else if (ID1_hit == 1) begin
+                
+        else if (ID1_hit) begin
             o_red=ID1_red;
             o_green=ID1_green;
             o_blue=ID1_blue;
         end
         
-        else if(life_hit == 1) begin
+        else if(life_hit) begin
             o_red=life_red;
             o_green=life_green;
             o_blue=life_blue;
@@ -296,13 +320,18 @@ module gfx_inst(
             o_green=cloud1_green;
             o_blue=cloud1_blue;
         end
-
+        else if (sprite_hit) begin
+            o_red=sprite_red;
+            o_green=sprite_green;
+            o_blue=sprite_blue;
+        end
         else if(cloud2_hit) begin
             o_red=cloud2_red;
             o_green=cloud2_green;
             o_blue=cloud2_blue;
         end
         
+
         else if(coin_hit) begin
             o_red=coin_red;
             o_green=coin_green;
@@ -362,6 +391,8 @@ module gfx_inst(
             o_green=bg_green;
             o_blue=bg_blue;
         end
+        
+   
     end
     
     assign ZERO_LIVES = OUT_OF_LIVES;
