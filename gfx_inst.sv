@@ -10,6 +10,7 @@ module gfx_inst(
     output reg [7:0] o_green,
     output reg [7:0] o_blue,
     
+    input wire  RUNNING,                            // from FSM to start terrain
     output wire out_coin_hit,                       // tell FSM to deactivate coin
     output wire out_barrier_hit,                    // tell FSM to deactivate barrier
     output wire OUT_AIRBORNE,                       // check if airborne
@@ -176,7 +177,28 @@ module gfx_inst(
         .out_of_lives   (OUT_OF_LIVES)          // send to FSM  
     );
 
-     //cloud1 compositor
+    terrain_right terra_right (
+        .i_x            (i_x),
+        .i_y            (i_y),
+        .i_v_sync        (i_v_sync),
+        .o_red          (cloud1_red),
+        .o_green        (cloud1_green),
+        .o_blue         (cloud1_blue),
+        .o_sprite_hit   (cloud1_hit),
+        .ACTIVE         (RUNNING)
+    );
+    
+        terrain_left terra_left (
+        .i_x            (i_x),
+        .i_y            (i_y),
+        .i_v_sync       (i_v_sync),
+        .o_red          (cloud2_red),
+        .o_green        (cloud2_green),
+        .o_blue         (cloud2_blue),
+        .o_sprite_hit   (cloud2_hit),
+        .ACTIVE         (RUNNING)
+    );
+
 //    cloud1_compositor cloud1 (
 //        .i_x            (i_x),
 //        .i_y            (i_y),
@@ -187,15 +209,15 @@ module gfx_inst(
 //        .o_sprite_hit   (cloud1_hit)
 //    );
     
-    cloud2_compositor cloud2 (
-        .i_x            (i_x),
-        .i_y            (i_y),
-        .i_v_sync       (i_v_sync),
-        .o_red          (cloud2_red),
-        .o_green        (cloud2_green),
-        .o_blue         (cloud2_blue),
-        .o_sprite_hit   (cloud2_hit)
-    );
+//    cloud2_compositor cloud2 (
+//        .i_x            (i_x),
+//        .i_y            (i_y),
+//        .i_v_sync       (i_v_sync),
+//        .o_red          (cloud2_red),
+//        .o_green        (cloud2_green),
+//        .o_blue         (cloud2_blue),
+//        .o_sprite_hit   (cloud2_hit)
+//    );
     
     final_score final_score_module(
         .i_x                (i_x),

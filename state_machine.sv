@@ -5,6 +5,7 @@ module state_machine(
 //    input wire MV_RIGHT,
 //    input wire MV_JUMP,
     
+    output wire [2:0]   ACTIVE_LED,             // tell if barrier or coin active
     input wire          PENGUIN_HIT,
     input wire          COIN_HIT,
     output wire [11:0]  DISTANCE_TO_GO,
@@ -50,31 +51,31 @@ module state_machine(
 
     always@(negedge i_v_sync) begin
         if (ZERO_LIVES == 1) begin
-            current_state = FINISH;
-            active_barrier = RELEASE_NULL;
-            active_coin = RELEASE_NULL;
+            current_state <= FINISH;
+            active_barrier <= RELEASE_NULL;
+            active_coin <= RELEASE_NULL;
         end
     
         // Progression
         if(current_state == START && ZERO_LIVES == 0) begin                                        // 0
             if (remaining_distance == 12'd180) begin
-                active_barrier = RELEASE_NULL; 
-                active_coin = ON_MID;
-                current_state = COIN1; // move to the next state
+                active_barrier <= RELEASE_NULL; 
+                active_coin <= ON_MID;
+                current_state <= COIN1; // move to the next state
             end 
         end
         
         else if (current_state == COIN1 && ZERO_LIVES == 0) begin                                  // 1
             if(remaining_distance == 12'd160) begin
-                active_coin = RELEASE_NULL;
-                active_barrier = ON_MID;
-                current_state = BARRIER1;
+                active_coin <= RELEASE_NULL;
+                active_barrier <= ON_MID;
+                current_state <= BARRIER1;
             end
         end
 
         else if (current_state == BARRIER1 && ZERO_LIVES == 0) begin                               //2
             if(remaining_distance == 12'd140) begin
-                active_barrier = RELEASE_NULL;
+                active_barrier <= RELEASE_NULL;
                 active_coin = ON_RIGHT;
                 current_state = COIN2;
             end
@@ -82,76 +83,77 @@ module state_machine(
 
         else if(current_state == COIN2 && ZERO_LIVES == 0) begin                                   //3
             if(remaining_distance == 12'd120) begin
-                active_barrier = RELEASE_NULL;
-                active_coin = ON_LEFT;
-                current_state = COIN3;
+                active_barrier <= RELEASE_NULL;
+                active_coin <= ON_LEFT;
+                current_state <= COIN3;
             end
         end
 
         else if(current_state == COIN3 && ZERO_LIVES == 0) begin                                  //4
             if(remaining_distance == 12'd100) begin
-                active_coin = RELEASE_NULL;
-                active_barrier = ON_LEFT;
-                current_state = BARRIER2;
+                active_coin <= RELEASE_NULL;
+                active_barrier <= ON_LEFT;
+                current_state <= BARRIER2;
             end
         end
 
         else if(current_state == BARRIER2 && ZERO_LIVES == 0) begin                                //5
             if(remaining_distance == 12'd80) begin
-                active_barrier = RELEASE_NULL;
-                active_coin = ON_RIGHT;
-                current_state = COIN4;
+                active_barrier <= RELEASE_NULL;
+                active_coin <= ON_RIGHT;
+                current_state <= COIN4;
             end
         end
 
         else if(current_state == COIN4 && ZERO_LIVES == 0) begin                                   //6
             if(remaining_distance == 12'd60) begin
-                active_barrier = ON_RIGHT;
-                active_coin = RELEASE_NULL;
-                current_state = BARRIER3;
+                active_barrier <= ON_RIGHT;
+                active_coin <= RELEASE_NULL;
+                current_state <= BARRIER3;
             end
         end 
 
         else if(current_state == BARRIER3 && ZERO_LIVES == 0) begin                                //7
             if(remaining_distance == 12'd40) begin
-                active_barrier = RELEASE_NULL;
-                active_coin = ON_RIGHT;
-                current_state = COIN5;
+                active_barrier <= RELEASE_NULL;
+                active_coin <= ON_RIGHT;
+                current_state <= COIN5;
             end
         end
 
         else if (current_state == COIN5 && ZERO_LIVES == 0) begin                                  //8
             if(remaining_distance == 12'd20) begin
-                active_coin = RELEASE_NULL;
-                active_barrier = ON_RIGHT;
-                current_state = BARRIER4;
+                active_coin <= RELEASE_NULL;
+                active_barrier <= ON_RIGHT;
+                current_state <= BARRIER4;
             end
         end
 
         else if (current_state == BARRIER4 && ZERO_LIVES == 0) begin                               //9
             if(remaining_distance == 12'd0) begin
-                active_coin = RELEASE_NULL;
-                active_barrier = RELEASE_NULL;
-                current_state = FINISH;
+                active_coin <= RELEASE_NULL;
+                active_barrier <= RELEASE_NULL;
+                current_state <= FINISH;
             end
         end
         
         else if (current_state == FINISH) begin                                 // 10
-            active_barrier = RELEASE_NULL;
-            active_coin = RELEASE_NULL;
+            active_barrier <= RELEASE_NULL;
+            active_coin <= RELEASE_NULL;
         end
         
         
         // deactivate barrier or coin if hit
         if(PENGUIN_HIT) begin
-            active_barrier = RELEASE_NULL;
+            active_barrier <= RELEASE_NULL;
         end
         
         if(COIN_HIT) begin
-            active_coin = RELEASE_NULL;
+            active_coin <= RELEASE_NULL;
         end
     end
     
+    assign ACTIVE_LED = (active_barrier != RELEASE_NULL) ? 3'b100 : (active_coin != RELEASE_NULL ? 3'b110 : 3'b010);
     assign DISTANCE_TO_GO = remaining_distance;
     assign O_CURRENT_STATE = current_state;
     assign RELEASE_COIN = active_coin;

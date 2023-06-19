@@ -16,12 +16,14 @@ module HDMI_TOP(
     output wire go_led,
     output wire barrier_led,
    
+    output wire [2:0] led5,             // show which is active
     output wire coin_led,
     output wire air_led,
     input wire btn1,                    // move penguin left
     input wire btn2,                    // jump penguin
     input wire btn3,                    // move pengiun right
     input wire [1:0] sw                 // only start game when HIGH sw[0] RIGHT
+    
     );
     assign go_led = sw[0];
     wire de;
@@ -105,6 +107,7 @@ module HDMI_TOP(
         .SPRITE_REFRESHER       (REFRESHER),
         .PENGUIN_HIT            (PENGUIN_HIT),
         .COIN_HIT               (COIN_HIT),
+        .ACTIVE_LED             (led5),
         .ZERO_LIVES             (ZERO_LIVES)            // receive from GFX
    );
    
@@ -127,6 +130,7 @@ module HDMI_TOP(
         .MV_JUMP                (btn2),
         .OUT_AIRBORNE           (air_led),
         .out_coin_hit           (COIN_HIT),
+        .RUNNING                (sw[0]),
         .ZERO_LIVES             (ZERO_LIVES)                // send to FSM
         );
     
