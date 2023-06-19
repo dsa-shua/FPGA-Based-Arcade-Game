@@ -185,6 +185,7 @@ module gfx_inst(
         .o_green        (cloud1_green),
         .o_blue         (cloud1_blue),
         .o_sprite_hit   (cloud1_hit),
+        .STATE_CHECK    (ACTIVATE_FINAL),
         .ACTIVE         (RUNNING)
     );
     
@@ -196,6 +197,7 @@ module gfx_inst(
         .o_green        (cloud2_green),
         .o_blue         (cloud2_blue),
         .o_sprite_hit   (cloud2_hit),
+        .STATE_CHECK    (ACTIVATE_FINAL),
         .ACTIVE         (RUNNING)
     );
 

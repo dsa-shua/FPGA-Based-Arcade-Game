@@ -7,6 +7,7 @@ module terrain_left (
     output wire [7:0] o_blue,
     output wire o_sprite_hit,
     
+    input wire STATE_CHECK,
     input wire ACTIVE                       // receive sw[0]
     );
     
@@ -67,7 +68,7 @@ module terrain_left (
     assign o_sprite_hit = (sprite_hit_y & sprite_hit_x) && (selected_palette != 2'd0);
 
     always@(posedge i_v_sync) begin
-        if(ACTIVE) begin
+       if(ACTIVE && STATE_CHECK == 0) begin
             sprite_x <= sprite_x - 1;
             sprite_y <= sprite_y + 1;
             

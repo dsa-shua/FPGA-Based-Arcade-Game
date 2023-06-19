@@ -7,6 +7,7 @@ module terrain_right (
     output wire [7:0] o_blue,
     output wire o_sprite_hit,
     
+    input wire STATE_CHECK,
     input wire ACTIVE
     );
     
@@ -59,8 +60,7 @@ module terrain_right (
 
     wire [1:0] selected_palette;
 
-    assign selected_palette = sprite_x_flip ? (sprite_y_flip ? sprite_data[15-sprite_render_y][15-sprite_render_x]: sprite_data[sprite_render_y][15-sprite_render_x])
-                                            : (sprite_y_flip ? sprite_data[15-sprite_render_y][sprite_render_x]   : sprite_data[sprite_render_y][sprite_render_x]);
+    assign selected_palette = sprite_data[sprite_render_y][sprite_render_x];
                                                                          
     assign o_red    = (sprite_hit_x && sprite_hit_y) ? palette_colors[selected_palette][2] : 8'hXX;
     assign o_green  = (sprite_hit_x && sprite_hit_y) ? palette_colors[selected_palette][1] : 8'hXX;
@@ -68,7 +68,7 @@ module terrain_right (
     assign o_sprite_hit = (sprite_hit_y & sprite_hit_x) && (selected_palette != 2'd0);
 
     always@(posedge i_v_sync) begin
-        if(ACTIVE) begin
+        if(ACTIVE && STATE_CHECK == 0) begin
             sprite_x <= sprite_x + 1;
             sprite_y <= sprite_y + 1;
             
