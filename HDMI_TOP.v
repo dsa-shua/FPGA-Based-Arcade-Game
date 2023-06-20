@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`default_nettype none
+//`default_nettype wire
 
 module HDMI_TOP(
     input  wire CLK,                // board clock: 100 MHz on Arty/Basys3/Nexys
@@ -13,19 +13,21 @@ module HDMI_TOP(
     output wire [2:0] hdmi_tx_n,    // Three HDMI channels differential negative
     output wire [2:0] hdmi_tx_p,     // Three HDMI channels differential positive
     output wire clk_lock,
+//    output wire [3:0] led,
     output wire go_led,
     output wire barrier_led,
-   
-    output wire [2:0] led5,             // show which is active
     output wire coin_led,
-    output wire air_led,
+    output wire jump_led,
+    output wire [2:0] led5,             // show which is active
     input wire btn1,                    // move penguin left
     input wire btn2,                    // jump penguin
     input wire btn3,                    // move pengiun right
-    input wire [1:0] sw                 // only start game when HIGH sw[0] RIGHT
-    
+    input wire [1:0] sw,                // only start game when HIGH sw[0] RIGHT
+    output wire coin_intr,              // send interrupt on coin hit
+    output wire barrier_intr            // send interrupt on barrier hit
     );
     assign go_led = sw[0];
+//    assign led[0] = sw[0];
     wire de;
     wire rst = RST_BTN;
     // Display Clocks
@@ -128,16 +130,20 @@ module HDMI_TOP(
         .MV_LEFT                (btn3),
         .MV_RIGHT               (btn1),
         .MV_JUMP                (btn2),
-        .OUT_AIRBORNE           (air_led),
+        .OUT_AIRBORNE           (jump_led),
         .out_coin_hit           (COIN_HIT),
         .RUNNING                (sw[0]),
         .ZERO_LIVES             (ZERO_LIVES)                // send to FSM
         );
+      
+      assign coin_intr = COIN_HIT;
+      assign barrier_intr = PENGUIN_HIT;
+      assign coin_led = COIN_HIT;
+      assign barrier_led = PENGUIN_HIT;    
+//    assign led[3] = COIN_HIT;
+//    assign led[1] = PENGUIN_HIT;
     
-    assign coin_led = COIN_HIT;
-    assign barrier_led = PENGUIN_HIT;
-    
-    wire led;               // just dont connect :)
+    wire ledd;               // just dont connect :)
     wire tmds_ch0_serial, tmds_ch1_serial, tmds_ch2_serial, tmds_chc_serial;
     HDMI_generator HDMI_out (
         .i_pix_clk(pix_clk),
@@ -154,7 +160,7 @@ module HDMI_TOP(
         .o_tmds_ch1_serial(tmds_ch1_serial),
         .o_tmds_ch2_serial(tmds_ch2_serial),
         .o_tmds_chc_serial(tmds_chc_serial),  // encode pixel clock via same path
-        .rst_oserdes(led)
+        .rst_oserdes(ledd)
     );
 
     // TMDS Buffered Output
