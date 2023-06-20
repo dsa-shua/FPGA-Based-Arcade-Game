@@ -19,7 +19,7 @@ module state_machine(
     // wait: waiting for switch to turn up
     enum logic [3:0] {START, COIN1, BARRIER1, COIN2, COIN3, BARRIER2, COIN4, BARRIER3, COIN5, BARRIER4, FINISH} STATE;
     reg [3:0] /* verilator lint_off UNOPTFLAT */ current_state = START;
-    logic [6:0] counter; // take top 4 bits for 1
+    logic [5:0] counter; // take top 4 bits for 1
     reg REFRESHER = 1'b0;
     logic [3:0] timer;
     reg [11:0] remaining_distance = 11'd200; // start at 200 meters
@@ -40,7 +40,7 @@ module state_machine(
     always@(posedge i_v_sync) begin
         if(current_state != FINISH && GAME_SWITCH != 0) begin
             counter <= counter + 1'b1;      
-            if(counter == 7'b111_1111) begin
+            if(counter == 6'b11_1111) begin
                 remaining_distance = remaining_distance - 1; // slowly reduce the distance
             end
             if(counter[3:0] == 4'b1111) begin

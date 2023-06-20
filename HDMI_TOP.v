@@ -14,7 +14,7 @@ module HDMI_TOP(
     output wire [2:0] hdmi_tx_p,     // Three HDMI channels differential positive
     output wire clk_lock,
 //    output wire [3:0] led,
-    output wire go_led,
+//    output wire go_led,
     output wire barrier_led,
     output wire coin_led,
     output wire jump_led,
@@ -26,8 +26,8 @@ module HDMI_TOP(
     output wire coin_intr,              // send interrupt on coin hit
     output wire barrier_intr            // send interrupt on barrier hit
     );
-    assign go_led = sw[0];
-//    assign led[0] = sw[0];
+   
+
     wire de;
     wire rst = RST_BTN;
     // Display Clocks
@@ -99,6 +99,7 @@ module HDMI_TOP(
     wire        PENGUIN_HIT;
     wire        COIN_HIT;
    
+//   assign go_led = sw[0];
    state_machine FSM(
         .GAME_SWITCH            (sw[0]),
         .i_v_sync               (v_sync),
@@ -136,12 +137,11 @@ module HDMI_TOP(
         .ZERO_LIVES             (ZERO_LIVES)                // send to FSM
         );
       
-      assign coin_intr = COIN_HIT;
-      assign barrier_intr = PENGUIN_HIT;
+      assign barrier_intr = (FSM_CURRENT_STATE == 4'd10) ? 0 : PENGUIN_HIT;   
       assign coin_led = COIN_HIT;
-      assign barrier_led = PENGUIN_HIT;    
-//    assign led[3] = COIN_HIT;
-//    assign led[1] = PENGUIN_HIT;
+      assign barrier_led = PENGUIN_HIT;
+      assign coin_intr = COIN_HIT;
+      
     
     wire ledd;               // just dont connect :)
     wire tmds_ch0_serial, tmds_ch1_serial, tmds_ch2_serial, tmds_chc_serial;
