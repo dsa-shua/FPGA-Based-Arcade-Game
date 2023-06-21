@@ -26,16 +26,16 @@ module final_score (
         .o_sprite_hit   (label_hit)
     );
 
-    digit_big final_score_display(
-        .i_x            (i_x),
-        .i_y            (i_y),
-        .i_v_sync       (i_v_sync),
-        .value          (score_value),
-        .o_red          (score_red),
-        .o_green        (score_green),
-        .o_blue         (score_blue),
-        .o_sprite_hit   (score_hit)
-    );
+//    digit_big final_score_display(
+//        .i_x            (i_x),
+//        .i_y            (i_y),
+//        .i_v_sync       (i_v_sync),
+//        .value          (score_value),
+//        .o_red          (score_red),
+//        .o_green        (score_green),
+//        .o_blue         (score_blue),
+//        .o_sprite_hit   (score_hit)
+//    );
 
     assign o_red   = (label_hit) ? label_red : ((score_hit) ? score_red : 8'hXX);
     assign o_green = (label_hit) ? label_green : ((score_hit) ? score_green : 8'hXX);
