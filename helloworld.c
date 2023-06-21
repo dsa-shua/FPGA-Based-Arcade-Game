@@ -189,7 +189,7 @@ static XScuGic_Config *GicConfig;
 
 
 
-void ExtIrq_Handler1(void *InstancePtr){
+void Barrier_Handler(void *InstancePtr){
 	xil_printf("BARRIER HIT\r\n");
 	note(1, 4*440);
 	note(1, 8*440);
@@ -197,7 +197,7 @@ void ExtIrq_Handler1(void *InstancePtr){
 	note(1, 8*440);
 }
 
-void ExtIrq_Handler(void *InstancePtr)
+void Coin_Handler(void *InstancePtr)
 {
 	xil_printf("COIN HIT\r\n");
 	note(1, 8*440);
@@ -216,7 +216,7 @@ int interrupt_init1()
 {
 	int Status;
 
-	Status = XScuGic_Connect(&InterruptController, 62U, (Xil_ExceptionHandler)ExtIrq_Handler1, (void *)NULL);
+	Status = XScuGic_Connect(&InterruptController, 62U, (Xil_ExceptionHandler)Barrier_Handler, (void *)NULL);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -244,7 +244,7 @@ int interrupt_init()
 		return XST_FAILURE;
 	}
 
-	Status = XScuGic_Connect(&InterruptController, XPAR_FABRIC_EXT_IRQ_INTR, (Xil_ExceptionHandler)ExtIrq_Handler, (void *)NULL);
+	Status = XScuGic_Connect(&InterruptController, XPAR_FABRIC_EXT_IRQ_INTR, (Xil_ExceptionHandler)Coin_Handler, (void *)NULL);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
