@@ -327,9 +327,6 @@ localparam [0:39][0:31][3:0] sprite_data1 = {/* verilator lint_off LITENDIAN */
                     else if (CURRENT_LANE == MID) begin
                         CURRENT_LANE <= RIGHT;
                     end
-                    else if (CURRENT_LANE == RIGHT) begin
-                    
-                    end
                 end
             end
         end
